@@ -389,14 +389,14 @@ if wantColor == 1:
 
 mp.xlabel('Phase $\phi$')
 
-mp.show()
+#mp.show()
 
 for count in range(200,300):
 	print >> fitout, '{0:.2f} {1:.3f} {2:.3f}'.format(ir1x[count]-1.0, ir11[count], ir21[count])
 
 
 plotname = cepname+'.eps'
-mp.savefig(plotname, transparent='True')
+mp.savefig(plotname, transparent='False')
 
 avsout.close()
 

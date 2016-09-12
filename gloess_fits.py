@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import numpy.ma as ma
 
 
 #def fit2(x1, y1, n, wt, mwt, c1, c2, c3, sigma_c1, sigma_c2, sigma_c3, chisum, q, jstep):
@@ -97,6 +98,7 @@ def moment(data,n):
 	
 	
 def fit_one_band(data,err,phases,n,smooth):
+### n parameter is redundant, phase this out
 	np.seterr(divide='ignore')
 	np.seterr(over='ignore')
 	y = data[data<50]
@@ -106,21 +108,20 @@ def fit_one_band(data,err,phases,n,smooth):
 	y = np.concatenate((y,y,y,y,y))
 	yerr = np.concatenate((yerr,yerr,yerr,yerr,yerr))
 	xphase = np.concatenate((phase,(phase+1.0),(phase+2.0),(phase+3.0),(phase+4.0)))
+	size_of_data = len(y)
 
-	n5 = n*5
-
-	dist = np.zeros( (n5,500) )
-	weight = np.zeros( (n5) )
+	dist = np.zeros( (size_of_data,500) )
+	weight = np.zeros( (size_of_data) )
 	x = np.zeros( (500) )
-	xz = np.zeros( (n5) )
+	xz = np.zeros( (size_of_data) )
 	data1 = np.zeros( ( 500) )
 	for count in range(0,500):
 		x[count] = -0.99 + 0.01*count
-		for datacount in range(0,n5):
+		for datacount in range(0, size_of_data):
 			dist[datacount,count] =  np.abs(xphase[datacount] - x[count])
 			weight[datacount] = np.exp(-1.0*(dist[datacount,count]**2) /smooth**2) / yerr[datacount]
 			xz[datacount] = xphase[datacount] - x[count]
-		data1[count]  = fit2(xz,y,n5,weight)	
+		data1[count]  = fit2(xz,y,size_of_data,weight)	
 	return (data1, x, y, yerr, xphase)
 	
 def phase_mjds(period, mjd):
