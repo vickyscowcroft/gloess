@@ -3,7 +3,6 @@
 import numpy as np
 import matplotlib.pyplot as mp
 import sys
-import gloess_fits as gf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
 import os
@@ -13,6 +12,9 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'serif'
 rcParams['font.serif'] = ['Garamond']
 
+sys.path.append('/Users/vs522/Dropbox/Python')
+
+import gloess_fits as gf
 
 
 du = []

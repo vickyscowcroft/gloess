@@ -9,11 +9,11 @@ import matplotlib.gridspec as gridspec
 import os
 import re
 import matplotlib
-os.environ['PATH'] = os.environ['PATH'] + ':/Library/Tex/texbin/'
+#os.environ['PATH'] = os.environ['PATH'] + ':/Library/Tex/texbin/'
 from matplotlib import rcParams
-matplotlib.rc('text',usetex=True)
-rcParams['font.family'] = 'serif'
-rcParams['font.serif'] = ['Garamond']
+#matplotlib.rc('text',usetex=True)
+rcParams['font.family'] = 'sanserif'
+#rcParams['font.serif'] = ['Garamond']
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
@@ -237,7 +237,7 @@ mp.clf()
 
 #fig = plt.figure()
 #ax1 = fig.add_subplot(111)
-#mp.figure(figsize=(16.0,10.0))
+mp.figure(figsize=(16.0,10.0))
 
 
 
