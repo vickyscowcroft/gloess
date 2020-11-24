@@ -1,11 +1,12 @@
 #!/usr/bin/env/python
 
 import numpy as np
-import matplotlib.pyplot as mp
+import matplotlib.pyplot as plt
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
 import os
+import matplotlib
 os.environ['PATH'] = os.environ['PATH'] + ':/usr/texbin'
 matplotlib.rc('text',usetex=True)
 from matplotlib import rcParams
@@ -60,10 +61,10 @@ input = sys.argv[1]
 counter = 0
 
 ## Want to know whether the IRAC data is phased or not. 
-## If it is phased, must reduce the uncertainty by another factor of sqrt(N)
+## If it is phased, must reduce the uncertainty by another factor of np.sqrt(N)
 ## if phased == 1 then true. if phased == 0, false
 
-print input
+print(input)
 
 for line in open(input):
 	data = line.split()
@@ -164,7 +165,7 @@ nir4= sum(ir4<50)
 
 # Phases don't need to be done individually by band - only depends on P
 phase = (mjd / period) - np.floor(mjd / period)
-phase = np.concatenate((phase,(phase+1.0),(phase+2.0),(phase+3.0),(phase+4.0)))
+#phase = np.concatenate((phase,(phase+1.0),(phase+2.0),(phase+3.0),(phase+4.0)))
 
 # Usage:  fit_one_band(data,err,phases,n,smooth):
 maxvals = []
@@ -212,8 +213,8 @@ minvals = np.array(minvals)
 
 max = np.max(maxvals)
 min = np.min(minvals)
-print cepname, ' ---- Period =', period, 'days'
-print '------------------------------------------------------'
+print(cepname, ' ---- Period =', period, 'days')
+print('------------------------------------------------------')
 
 # Set up names for output files
 
@@ -228,11 +229,11 @@ minlim = min - 0.5
 
 
 
-mp.clf()
+plt.clf()
 
 #fig = plt.figure()
 #ax1 = fig.add_subplot(111)
-#mp.figure(figsize=(16.0,10.0))
+#plt.figure(figsize=(16.0,10.0))
 
 
 gs = gridspec.GridSpec(3, 4)
@@ -243,25 +244,25 @@ ax4 = plt.subplot(gs[2, 2:4])
 ax1.axis([1,3.5,(maxlim),(minlim)])
 titlestring = cepname + ', P = ' + str(period) + ' days'
 #print titlestring
-mp.suptitle(titlestring, fontsize=20)
+plt.suptitle(titlestring, fontsize=20)
 
 ax1.set_ylabel('Magnitude')
 ax1.set_xlabel('Phase $\phi$')
 
 
 ## Fitting and plotting for each band
-print nu, nb, nv, nr, ni, nj, nh, nk, nir1, nir2, nir3, nir4
+print(nu, nb, nv, nr, ni, nj, nh, nk, nir1, nir2, nir3, nir4)
 if nu > 0:
 	u1, ux, yu, yeu, xphaseu = gf.fit_one_band(u,eu,phase,nu,xu)
 	ax1.plot(ux,u1+3.,'k-')
 	ax1.plot(xphaseu,yu+3.,color='Violet',marker='o',ls='None', label='$U+3$')
 	aveu, adevu, sdevu, varu, skewu, kurtosisu, ampu = gf.moment(u1[200:300],100)
 	if nu > 1:
-		print  '<U> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveu, sdevu/sqrt(nu), ampu)
-		print >> avsout, '<U> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveu, sdevu/sqrt(nu), ampu)
+		print('<U> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveu, sdevu/np.sqrt(nu), ampu))
+		avsout.write('<U> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveu, sdevu/np.sqrt(nu), ampu))
 	if nu == 1:
-		print  'U = {0:.3f} --- single point'.format(aveu)
-		print >> avsout, 'U = {0:.3f} --- single point'.format(aveu)
+		print('U = {0:.3f} --- single point'.format(aveu))
+		avsout.write('U = {0:.3f} --- single point'.format(aveu))
 		
 if nb > 0:
 	b1, bx, yb, yeb, xphaseb = gf.fit_one_band(b,eb,phase,nb,xb)
@@ -269,11 +270,11 @@ if nb > 0:
 	ax1.plot(xphaseb,yb+1.5,color='MediumSlateBlue',marker='o',ls='None', label='$B+1.5$')
 	aveb, adevb, sdevb, varb, skewb, kurtosisb, ampb = gf.moment(b1[200:300],100)
 	if nb > 1:
-		print  '<B> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveb, sdevb/sqrt(nb), ampb)
-		print >> avsout, '<B> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveb, sdevb/sqrt(nb), ampb)
+		print('<B> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveb, sdevb/np.sqrt(nb), ampb))
+		avsout.write('<B> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveb, sdevb/np.sqrt(nb), ampb))
 	if nb == 1:
-		print  'B = {0:.3f} --- single point'.format(aveb)
-		print >> avsout,  'B = {0:.3f} --- single point'.format(aveb)
+		print('B = {0:.3f} --- single point'.format(aveb))
+		avsout.write('B = {0:.3f} --- single point'.format(aveb))
 		
 if nv > 0:
 	v1, vx, yv, yev, xphasev = gf.fit_one_band(v,ev,phase,nv,xv)
@@ -281,11 +282,11 @@ if nv > 0:
 	ax1.plot(xphasev,yv+1.2,color='DodgerBlue',marker='o',ls='None', label='$V+1.2$')
 	avev, adevv, sdevv, varv, skewv, kurtosisv, ampv = gf.moment(v1[200:300],100)
 	if nv > 1:
-		print >> avsout, '<V> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} ' .format(avev, sdevv/sqrt(nv), ampv)
-		print  '<V> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} ' .format(avev, sdevv/sqrt(nv), ampv)
+		avsout.write('<V> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} ' .format(avev, sdevv/np.sqrt(nv), ampv))
+		print('<V> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} ' .format(avev, sdevv/np.sqrt(nv), ampv))
 	if nv == 1:
-		print  'V = {0:.3f} --- single point'.format(avev)
-		print   >> avsout, 'V = {0:.3f} --- single point'.format(avev)
+		print('V = {0:.3f} --- single point'.format(avev))
+		avsout.write('V = {0:.3f} --- single point'.format(avev)) 
 
 if nr > 0:
 	r1, rx, yr, yer, xphaser = gf.fit_one_band(r,er,phase,nr,xr)
@@ -293,11 +294,11 @@ if nr > 0:
 	ax1.plot(xphaser,yr+0.7,color='Turquoise',marker='o',ls='None', label='$R+0.7$')
 	aver, adevr, sdevr, varr, skewr, kurtosisr, ampr = gf.moment(r1[200:300],100)
 	if nr > 1:
-		print '<R> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aver, sdevr/sqrt(nr), ampr)
-		print >> avsout, '<R> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aver, sdevr/sqrt(nr), ampr)
+		print('<R> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aver, sdevr/np.sqrt(nr), ampr))
+		avsout.write('<R> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aver, sdevr/np.sqrt(nr), ampr))
 	if nr == 1:
-		print   >> avsout, 'R = {0:.3f} --- single point'.format(aver)
-		print    'R = {0:.3f} --- single point'.format(aver)
+		print('R = {0:.3f} --- single point'.format(aver))
+		avsout.write('R = {0:.3f} --- single point'.format(aver))
 	
 if ni > 0:
 	i1, ix, yi, yei, xphasei = gf.fit_one_band(i,ei,phase,ni,xi)
@@ -305,11 +306,11 @@ if ni > 0:
 	ax1.plot(xphasei,yi+0.2,color='LawnGreen',marker='o',ls='None', label='$I+0.2$')
 	avei, adevi, sdevi, vari, skewi, kurtosisi, ampi = gf.moment(i1[200:300],100)
 	if ni > 1:
-		print  '<I> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avei, sdevi/sqrt(ni), ampi)
-		print >> avsout, '<I> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avei, sdevi/sqrt(ni), ampi)
+		print('<I> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avei, sdevi/np.sqrt(ni), ampi))
+		avsout.write('<I> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avei, sdevi/np.sqrt(ni), ampi))
 	if ni == 1:
-		print   >> avsout, 'I = {0:.3f} --- single point'.format(avei)
-		print   'I = {0:.3f} --- single point'.format(avei)
+		avsout.write('I = {0:.3f} --- single point'.format(avei)) 
+		print('I = {0:.3f} --- single point'.format(avei))
 
 	
 if nj > 0:
@@ -318,11 +319,11 @@ if nj > 0:
 	ax1.plot(xphasej,yj,color='Gold',marker='o',ls='None', label='$J$')
 	avej, adevj, sdevj, varj, skewj, kurtosisj, ampj = gf.moment(j1[200:300],100)
 	if nj > 1:
-		print >> avsout, '<J> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avej, sdevj/sqrt(nj), ampj)
-		print '<J> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avej, sdevj/sqrt(nj), ampj)
+		avsout.write('<J> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avej, sdevj/np.sqrt(nj), ampj))
+		print('<J> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avej, sdevj/np.sqrt(nj), ampj))
 	if nj == 1:
-		print   >> avsout, 'J = {0:.3f} --- single point'.format(avej)
-		print  'J = {0:.3f} --- single point'.format(avej)
+		avsout.write('J = {0:.3f} --- single point'.format(avej))
+		print('J = {0:.3f} --- single point'.format(avej))
 	
 if nh > 0:
 	h1, hx, yh, yeh, xphaseh = gf.fit_one_band(h,eh,phase,nh,xh)
@@ -330,11 +331,11 @@ if nh > 0:
 	ax1.plot(xphaseh,yh-0.4,color='DarkOrange',marker='o',ls='None', label='$H-0.4$')
 	aveh, adevh, sdevh, varh, skewh, kurtosish, amph = gf.moment(h1[200:300],100)
 	if nh > 1:
-		print >> avsout, '<H> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveh, sdevh/sqrt(nh), amph)
-		print  '<H> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveh, sdevh/sqrt(nh), amph)
+		avsout.write('<H> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveh, sdevh/np.sqrt(nh), amph))
+		print('<H> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveh, sdevh/np.sqrt(nh), amph))
 	if nh == 1:
-		print >> avsout, 'H = {0:.3f} --- single point'.format(aveh)
-		print 'H = {0:.3f} --- single point'.format(aveh)
+		avsout.write('H = {0:.3f} --- single point'.format(aveh))
+		print('H = {0:.3f} --- single point'.format(aveh))
 
 if nk > 0:
 	k1, kx, yk, yek, xphasek = gf.fit_one_band(k,ek,phase,nk,xk)
@@ -342,77 +343,75 @@ if nk > 0:
 	ax1.plot(xphasek,yk-0.8,color='Red',marker='o',ls='None', label='$K-0.8$')
 	avek, adevk, sdevk, vark, skewk, kurtosisk, ampk = gf.moment(k1[200:300],100)
 	if nk > 1:
-		print >> avsout, '<K> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avek, sdevk/sqrt(nk), ampk)
-		print  '<K> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avek, sdevk/sqrt(nk), ampk)
+		avsout.write('<K> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avek, sdevk/np.sqrt(nk), ampk))
+		print('<K> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avek, sdevk/np.sqrt(nk), ampk))
 	if nk == 1:
-		print >> avsout, 'K = {0:.3f} --- single point'.format(avek)
-		print  'K = {0:.3f} --- single point'.format(avek)
+		avsout.write('K = {0:.3f} --- single point'.format(avek))
+		print('K = {0:.3f} --- single point'.format(avek))
 
 if nir1 > 0:
 	ir11, ir1x, yir1, yeir1, xphaseir1 = gf.fit_one_band(ir1,eir1,phase,nir1,xir1)
 	ax1.plot(ir1x,ir11-1.4,'k-')
- 	ax1.plot(xphaseir1,yir1-1.4,color='MediumVioletRed',marker='o',ls='None', label='$[3.6]-1.4$')
-## for RRLyrae WISE plots:
-#	ax1.plot(ir1x,ir11+1.,'k-')
-# 	ax1.plot(xphaseir1,yir1+1.,color='Turquoise',marker='o',ls='None', label='W1+1.0')
+	ax1.plot(xphaseir1,yir1-1.4,color='MediumVioletRed',marker='o',ls='None', label='$[3.6]-1.4$')
+
 	aveir1, adevir1, sdevir1, varir1, skewir1, kurtosisir1, ampir1 = gf.moment(ir11[200:300],100)
 	if phased == 1:
-		factor = sqrt(nir1)
+		factor = np.sqrt(nir1)
 	if phased == 0:
 		factor = 1 
 	if nir1 > 1:
-		print >> avsout, '<[3.6]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} N I1 = {3}'.format(aveir1, sdevir1/factor, ampir1,nir1)
-		print  '<[3.6]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir1, sdevir1/factor, ampir1)
+		avsout.write('<[3.6]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} N I1 = {3}'.format(aveir1, sdevir1/factor, ampir1,nir1))
+		print('<[3.6]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir1, sdevir1/factor, ampir1))
 	if nir1 == 1:
-		print >> avsout, '[3.6] = {0:.3f} --- single point'.format(aveir1)
-		print  '[3.6] = {0:.3f} --- single point'.format(aveir1)
+		avsout.write('[3.6] = {0:.3f} --- single point'.format(aveir1))
+		print('[3.6] = {0:.3f} --- single point'.format(aveir1))
 
 if nir2 > 0:
 	ir21, ir2x, yir2, yeir2, xphaseir2 = gf.fit_one_band(ir2,eir2,phase,nir2,xir2)
 	ax1.plot(ir2x,ir21-1.8,'k-')
- 	ax1.plot(xphaseir2,yir2-1.8,color='DeepPink',marker='o',ls='None', label='$[4.5]-1.8$')
+	ax1.plot(xphaseir2,yir2-1.8,color='DeepPink',marker='o',ls='None', label='$[4.5]-1.8$')
 ## For RRLyrae WISE plots:
 #	ax1.plot(ir2x,ir21,'k-')
 # 	ax1.plot(xphaseir2,yir2,color='Gold',marker='o',ls='None', label='W2')
 	aveir2, adevir2, sdevir2, varir2, skewir2, kurtosisir2, ampir2= gf.moment(ir21[200:300],100)
 	if phased == 1:
-		factor = sqrt(nir2)
+		factor = np.sqrt(nir2)
 	if phased == 0:
 		factor = 1
 
 	if nir2 > 1:
-		print >> avsout, '<[4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} N I2 = {3}' .format(aveir2, sdevir2/factor, ampir2,nir2)
-		print '<[4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir2, sdevir2/factor, ampir2)
+		avsout.write('<[4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f} N I2 = {3}' .format(aveir2, sdevir2/factor, ampir2,nir2))
+		print('<[4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir2, sdevir2/factor, ampir2))
 	if nir2 == 1:
-		print >> avsout, '[4.5] = {0:.3f} --- single point'.format(aveir2)
-		print '[4.5] = {0:.3f} --- single point'.format(aveir2)
+		avsout.write('[4.5] = {0:.3f} --- single point'.format(aveir2))
+		print('[4.5] = {0:.3f} --- single point'.format(aveir2))
 
 if nir3 > 0:
 	ir31, ir3x, yir3, yeir3, xphaseir3 = gf.fit_one_band(ir3,eir3,phase,nir3,xir3)
 	ax1.plot(ir3x,ir31-2.2,'k-')
- 	ax1.plot(xphaseir3,yir3-2.2,color='HotPink',marker='o',ls='None', label='$[5.8]-2.2$')
+	ax1.plot(xphaseir3,yir3-2.2,color='HotPink',marker='o',ls='None', label='$[5.8]-2.2$')
 ## For RRRLyrae WISE plots:
 #	ax1.plot(ir3x,ir31-1.,'k-')
 # 	ax1.plot(xphaseir3,yir3-1.,color='DeepPink',marker='o',ls='None', label='W3-1.0')
 	aveir3, adevir3, sdevir3, varir3, skewir3, kurtosisir3, ampir3 = gf.moment(ir31[200:300],100)
 	if nir3 > 1:
-		print >> avsout, '<[5.8]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir3, sdevir3, ampir3)
-		print  '<[5.8]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir3, sdevir3, ampir3)
+		avsout.write('<[5.8]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir3, sdevir3, ampir3))
+		print('<[5.8]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir3, sdevir3, ampir3))
 	if nir3 == 1:
-		print >> avsout, '[5.8] = {0:.3f} --- single point'.format(aveir3)
-		print  '[5.8] = {0:.3f} --- single point'.format(aveir3)
+		avsout.write('[5.8] = {0:.3f} --- single point'.format(aveir3))
+		print('[5.8] = {0:.3f} --- single point'.format(aveir3))
 
 if nir4 > 0:
 	ir41, ir4x, yir4, yeir4, xphaseir4 = gf.fit_one_band(ir4,eir4,phase,nir4,xir4)
 	ax1.plot(ir4x,ir41-2.6,'k-')
- 	ax1.plot(xphaseir4,yir4-2.6,color='PeachPuff',marker='o',ls='None', label='$[8.0]-2.6$')
+	ax1.plot(xphaseir4,yir4-2.6,color='PeachPuff',marker='o',ls='None', label='$[8.0]-2.6$')
 	aveir4, adevir4, sdevir4, varir4, skewir4, kurtosisir4, ampir4 = gf.moment(ir41[200:300],100)
 	if nir4 > 1:
-		print >> avsout, '<[8.0]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir4, sdevir4, ampir4)
-		print  '<[8.0]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir4, sdevir4, ampir4)
+		avsout.write('<[8.0]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir4, sdevir4, ampir4))
+		print('<[8.0]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(aveir4, sdevir4, ampir4))
 	if nir4 == 1:
-		print >> avsout, '[8.0] = {0:.3f} --- single point'.format(aveir4)
-		print  '[8.0] = {0:.3f} --- single point'.format(aveir4)
+		avsout.write('[8.0] = {0:.3f} --- single point'.format(aveir4))
+		print('[8.0] = {0:.3f} --- single point'.format(aveir4))
 
 handles, labels = ax1.get_legend_handles_labels() 
 #ax1.legend(handles[::-1],labels[::-1],bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., numpoints=1)
@@ -420,7 +419,7 @@ ax1.legend(handles[::-1],labels[::-1],loc=4, numpoints=1,prop={'size':10})
 
 
 
-#mp.setp(ax1.get_xticklabels(),visible=False)
+#plt.setp(ax1.get_xticklabels(),visible=False)
 
 
 ### Define the colour curve
@@ -437,11 +436,11 @@ colour_phases = np.concatenate((colour_phases,(colour_phases+1.),(colour_phases+
 
 avecol, adevcol, sdevcol, varcol, skewcol, kurtosiscol, ampcol = gf.moment(colour_curve[200:300],100)
 
-print >> avsout, '<[3.6] - [4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avecol, sdevcol/factor, ampcol)
-print  '<[3.6] - [4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avecol, sdevcol/factor, ampcol)
+avsout.write('<[3.6] - [4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avecol, sdevcol/factor, ampcol))
+print('<[3.6] - [4.5]> = {0:.3f}    std dev = {1:.3f}     amplitude = {2:.3f}' .format(avecol, sdevcol/factor, ampcol))
 
-print np.average(ir11[200:300]) + 0.3
-print np.average(ir11[200:300]) - 0.3
+print(np.average(ir11[200:300]) + 0.3)
+print(np.average(ir11[200:300]) - 0.3)
 
 ax2.axis([1,3.5,(np.average(ir11[200:300]) + 0.4),(np.average(ir11[200:300]) - 0.4)])
 ax2.yaxis.tick_right()
@@ -471,14 +470,14 @@ ax4.annotate('$[3.6] - [4.5]$', xy=(0.04, 0.8375), xycoords='axes fraction',font
 
 ax4.hlines(0,1,3.5,'k','dashdot')
 
-mp.setp(ax2.get_xticklabels(),visible=False)
-mp.setp(ax3.get_xticklabels(),visible=False)
+plt.setp(ax2.get_xticklabels(),visible=False)
+plt.setp(ax3.get_xticklabels(),visible=False)
 
-plotname = cepname+'.eps'
-mp.savefig(plotname, transparent='True')
+plotname = cepname+'.pdf'
+plt.savefig(plotname, transparent='True')
 
 avsout.close()
-mp.show()
+plt.show()
 #fitout.close()
 	
 	

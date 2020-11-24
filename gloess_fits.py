@@ -101,7 +101,11 @@ def fit_one_band(data,err,phases,n,smooth):
 ### n parameter is redundant, phase this out
 	np.seterr(divide='ignore')
 	np.seterr(over='ignore')
+	print(data)
 	y = data[data<50]
+	print(data.shape)
+	print(phases)
+	print(phases.shape)
 	phase = phases[data<50]
 	yerr = err[data<50]
 
