@@ -37,7 +37,7 @@ def phases_to_fit(xphase):
 	
 def get_weights(phase_array, yerr, smooth):
 	dist  = np.abs(phase_array)
-	weight = np.exp(-1*(dist**2) /smooth**2) / yerr 
+	weight = np.exp(-0.5*(dist**2) /smooth**2) / yerr 
 	return(weight)
 	
 
